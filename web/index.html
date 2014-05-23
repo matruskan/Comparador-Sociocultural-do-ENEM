@@ -9,6 +9,11 @@ and open the template in the editor.
         <title>TODO supply a title</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width">
+        <link href='http://fonts.googleapis.com/css?family=Roboto:300' rel='stylesheet' type='text/css'>
+        <style type="text/css">
+            html{background:#cccfdd;font-family: 'Roboto', sans-serif;}
+            body{background: #ffffff;width:700px;margin:20px auto;padding:20px;border:1px solid #bbbbbb;}
+        </style>
     </head>
     <body>
         <h2>Comparador Sociocultural do Enem</h2>
@@ -24,7 +29,7 @@ and open the template in the editor.
         <button onclick="atualizarGrafico()">Atualizar Gráfico</button>
         <br/>
         <br/>
-        <canvas id="myChart" width="400" height="400"></canvas>
+        <canvas id="myChart" width="700" height="400"></canvas>
         
         <script src="Chart.js"></script>
         <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
@@ -40,6 +45,7 @@ and open the template in the editor.
             function atualizarGrafico(){
                 //Get the context of the canvas element we want to select
                 var url = "/Comparador_Sociocultural_do_ENEM/servlet?fator="+$("#fator").find(":selected").val();
+                console.log(url);
                 $.ajax({
                     url: url,
                     type: "GET",
@@ -48,8 +54,7 @@ and open the template in the editor.
                         console.log("Data returned : " + data);
 
                         if (typeof data == 'object') {
-                            var ctx = document.getElementById("myChart").getContext("2d");
-                            new Chart(ctx).Line(data);
+                            criarGrafico(data);
                         }
 
                     },
@@ -58,6 +63,11 @@ and open the template in the editor.
                     }
                 });
                 
+            }
+            
+            function criarGrafico(data){
+                var ctx = document.getElementById("myChart").getContext("2d");
+                new Chart(ctx).Line(data);
             }
         </script>
     </body>
