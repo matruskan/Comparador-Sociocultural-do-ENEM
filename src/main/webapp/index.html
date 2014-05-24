@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Comparador Sociocultural do ENEM</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <link href='http://fonts.googleapis.com/css?family=Roboto:300' rel='stylesheet' type='text/css'>
+        <style type="text/css">
+            html{background:#dddddd;font-family: 'Roboto', sans-serif;}
+            body{background: #ffffff;width:700px;margin:20px auto;padding:20px;border:1px solid #eeeeee;}
+            select{max-width: 700px;}
+        </style>
+    </head>
+    <body>
+        <h2>Comparador Sociocultural do ENEM</h2>
+        <p>
+            É difícil relacionar os fatores socioculturais com a qualidade de
+            aprendizado. Os gráficos ajudarão a ver quais unidades da federação
+            estão com o melhor ensino, e quais os fatores socioculturais que
+            mais influenciaram.
+        </p>
+        <p>
+            Os dados foram obtidos de: <a href="http://portal.inep.gov.br/basica-levantamentos-acessar">http://portal.inep.gov.br/basica-levantamentos-acessar</a>
+        </p>
+        <p>Escolha o fator:
+        <select id="fator">
+        </select>
+        <button onclick="atualizarGrafico()">Atualizar Gráfico</button>
+        </p>
+        <div id="chartContainer" style="max-width:700px;height: 400px;"></div>
+        <!--<canvas id="myChart" width="700" height="400"></canvas>-->
+        
+        <script src="js/jquery-2.1.1.min.js"></script>
+        <script src="js/globalize.min.js"></script>
+        <script src="js/dx.chartjs.js"></script>
+        <script type="text/javascript">
+            var fatores = ["Até quando seu pai estudou?"//,//1
+//                "Até quando sua mãe estudou?",
+//                "Qual é a renda mensal de sua família? (Some a sua renda com a dos seus familiares.)",
+//                "Quantas pessoas moram em sua casa (incluindo você)?",
+//                "A residência de sua família é?", //5
+//                "A residência de sua família está localizada em?",
+//                "Você tem em sua casa? TV em cores",
+//                "",
+//                "Você tem em sua casa? Freezer (aparelho independente ou parte da geladeira duplex)",//14
+//                "Indique os motivos que levaram você a participar do ENEM: Aumentar a possibilidade de conseguir um emprego",//24
+//                "Indique os motivos que levaram você a participar do ENEM: Participar do Programa de Financiamento Estudantil - FIES",//29
+//                "Caso você ingresse no Ensino Superior privado pretende recorrer aos auxílios abaixo para custeio das mensalidades?  Bolsa de estudos da própria Instituição de Ensino Superior" //37
+            ];
+            function iniciar(){
+                for(i=0;i<fatores.length;i++){
+                    $('#fator').append("<option value='"+(i+1)+"'>"+fatores[i]+"</option>");
+                }
+            }
+            iniciar();
+            
+            function atualizarGrafico(){
+                //Get the context of the canvas element we want to select
+                var url = "/servlet?fator="+$("#fator").find(":selected").val();
+                console.log(url);
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        console.log("Data returned : " + data);
+
+                        if (typeof data == 'object') {
+                            criarGrafico(data);
+                        }
+
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log("jqXHR : "+jqXHR + " text status : " + textStatus + " error : " + errorThrown);
+                    }
+                });
+                
+            }
+            
+            function criarGrafico(data){
+                // Ainda não...
+//                 $("#chartContainer").dxChart(data);
+                $("#chartContainer").append("Em breve!");
+            }
+        </script>
+    </body>
+</html>
