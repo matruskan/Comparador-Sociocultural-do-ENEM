@@ -9,37 +9,52 @@ and open the template in the editor.
         <title>Comparador Sociocultural do ENEM</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width">
-        <link href='http://fonts.googleapis.com/css?family=Roboto:300' rel='stylesheet' type='text/css'>
-        <style type="text/css">
-            html{background:#dddddd;font-family: 'Roboto', sans-serif;}
-            body{background: #ffffff;width:700px;margin:20px auto;padding:20px;border:1px solid #eeeeee;}
-            select{max-width: 700px;}
-        </style>
+        <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-        <h2>Comparador Sociocultural do ENEM</h2>
+        <h1>Comparador Sociocultural do ENEM</h1>
         <p>
             É difícil relacionar os fatores socioculturais com a qualidade de
             aprendizado. Os gráficos ajudarão a ver quais unidades da federação
             estão com o melhor ensino, e quais os fatores socioculturais que
             mais influenciaram.
         </p>
-        <p>
-            Os dados foram obtidos de: <a href="http://portal.inep.gov.br/basica-levantamentos-acessar">http://portal.inep.gov.br/basica-levantamentos-acessar</a>
-        </p>
-        <p>Escolha o fator:
-        <select id="fator">
-        </select>
-        <button onclick="atualizarGrafico()">Atualizar Gráfico</button>
-        </p>
+        <table>
+            <tr>
+                <td>Escolha o fator:</td>
+                <td>
+                    <select id="fator">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Escolha a prova:</td>
+                <td>
+                    <select id="prova">
+                        <option value='CN'>Ciências da Natureza</option>
+                        <option value='CH'>Ciências Humanas</option>
+                        <option value='LC'>Linguagens e Códigos</option>
+                        <option value='MT'>Matemática</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <button onclick="atualizarGrafico()">Atualizar Gráfico</button>
+                </td>
+            </tr>
+        </table>
         <div id="chartContainer" style="max-width:700px;height: 400px;"></div>
+        <div class="sobre"><a href="sobre.html">Sobre</a></div>
         <!--<canvas id="myChart" width="700" height="400"></canvas>-->
         
         <script src="js/jquery-2.1.1.min.js"></script>
         <script src="js/globalize.min.js"></script>
         <script src="js/dx.chartjs.js"></script>
         <script type="text/javascript">
-            var fatores = ["Até quando seu pai estudou?"//,//1
+            var fatores = ["Em breve"];
+//                "Até quando seu pai estudou?",//1
 //                "Até quando sua mãe estudou?",
 //                "Qual é a renda mensal de sua família? (Some a sua renda com a dos seus familiares.)",
 //                "Quantas pessoas moram em sua casa (incluindo você)?",
@@ -51,7 +66,7 @@ and open the template in the editor.
 //                "Indique os motivos que levaram você a participar do ENEM: Aumentar a possibilidade de conseguir um emprego",//24
 //                "Indique os motivos que levaram você a participar do ENEM: Participar do Programa de Financiamento Estudantil - FIES",//29
 //                "Caso você ingresse no Ensino Superior privado pretende recorrer aos auxílios abaixo para custeio das mensalidades?  Bolsa de estudos da própria Instituição de Ensino Superior" //37
-            ];
+//            ];
             function iniciar(){
                 for(i=0;i<fatores.length;i++){
                     $('#fator').append("<option value='"+(i+1)+"'>"+fatores[i]+"</option>");
@@ -61,14 +76,16 @@ and open the template in the editor.
             
             function atualizarGrafico(){
                 //Get the context of the canvas element we want to select
-                var url = "/servlet?fator="+$("#fator").find(":selected").val();
+                var url = "/servlet?fator="+$("#fator").find(":selected").val()+"&prova="+$("#prova").find(":selected").val();
+//                var url = "/comparador-sociocultural-do-enem/servlet?fator="+$("#fator").find(":selected").val()+"&prova="+$("#prova").find(":selected").val();
                 console.log(url);
                 $.ajax({
                     url: url,
                     type: "GET",
                     dataType: "json",
                     success: function(data) {
-                        console.log("Data returned : " + data);
+                        console.log("Data returned : ");
+                        console.log(data);
 
                         if (typeof data == 'object') {
                             criarGrafico(data);
@@ -84,8 +101,8 @@ and open the template in the editor.
             
             function criarGrafico(data){
                 // Ainda não...
-//                 $("#chartContainer").dxChart(data);
-                $("#chartContainer").append("Em breve!");
+                 $("#chartContainer").dxChart(data);
+//                $("#chartContainer").append("Em breve!");
             }
         </script>
     </body>

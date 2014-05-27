@@ -6,6 +6,7 @@
 
 package br.org.universa.comparadorsocioculturaldoenem;
 
+import br.org.universa.comparadorsocioculturaldoenem.modelo.UF;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -13,6 +14,7 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.json.JsonWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -24,6 +26,10 @@ import javax.servlet.http.HttpServletResponse;
  * @author Matheus
  */
 public class servlet extends HttpServlet {
+    private static final String NOTA = "Nota";
+    private static final String RESPOSTA = "Resposta";
+    
+    private String[] valores = {"a","b","c","d","e","f"};
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,7 +46,8 @@ public class servlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             String fator = request.getParameter("fator");
-            if(fator!=null){
+            String prova = request.getParameter("prova");
+            if(fator!=null && prova!=null){
 //                String s =
 //"{ \"labels\" : [\"DF\",\"GO\",\"SP\",\"MG\",\"RS\",\"SC\"],"+
 //	"\"datasets\" : ["+
@@ -61,7 +68,7 @@ public class servlet extends HttpServlet {
 //	"]"+
 //"}";
 //                out.println(s);
-                write(out,getDxChart());
+                write(out,getDxChart(prova, fator));
             } else {
                 
             }
@@ -70,14 +77,19 @@ public class servlet extends HttpServlet {
         }
     }
     
-    private JsonObject getDxChart(){
+    private JsonObject getDxChart(String prova, String fator){
         return Json.createObjectBuilder()
                 .add("palette", "Soft Pastel")
-                .add("dataSource", getDataSource())
+                .add("dataSource", getDataSource(prova, fator))
                 .add("commonSeriesSettings",getCommonSeriesSettings())
-                .add("series",Json.createArrayBuilder()
-                    .add(getSeriesNota())
-                    .add(getSeriesEscolhida()).build())
+                .add("series",getSeries())
+                .add("valueAxis",Json.createArrayBuilder()
+                    .add(getAxisNota())
+                    .add(getAxisEscolha()).build())
+                .add("legend",Json.createObjectBuilder()
+                    .add("verticalAlignment", "bottom")
+                    .add("horizontalAlignment", "center").build())
+                .add("tooltip",getTooltip())
                 .build();
     }
     
@@ -90,35 +102,91 @@ public class servlet extends HttpServlet {
     private JsonObject getCommonSeriesSettings(){
         return Json.createObjectBuilder()
                 .add("argumentField","UF")
+                .add("axis", NOTA)
+                .add("type","fullstackedbar")
                 .build();
     }
     
     private JsonObject getSeriesNota() {
         return Json.createObjectBuilder()
-                .add("valueField", "nota")
-                .add("name","Nota").build();
+                .add("valueField", NOTA)
+                .add("name",NOTA)
+                .add("type","line").build();
     }
     
-    private JsonObject getSeriesEscolhida() {
-        return Json.createObjectBuilder()
-                .add("valueField", "R")
-                .add("name","Até quando seu pai estudou?").build();
+    private JsonArray getSeries() {
+        JsonArrayBuilder jab = Json.createArrayBuilder();
+//        for(int i=0; i<valores.length;i++){
+//            jab.add(Json.createObjectBuilder()
+//                .add("valueField", valores[i])
+//                .add("axis", RESPOSTA)
+//                .add("name",valores[i])
+//                .build());
+//        }
+        return jab.add(getSeriesNota()).build();
     }
     
-    private JsonArray getDataSource(){
+    private JsonArray getDataSource(String prova, String fator){
         JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
         for(int i = 0; i< UF.values().length; i++){
-                jsonArrayBuilder.add(getDataUF(UF.values()[i]));
+            jsonArrayBuilder.add(getDataUF(UF.values()[i], prova));
         }
         return jsonArrayBuilder.build();
     }
     
-    private JsonObject getDataUF(UF uf){
-        char[] valores = {'a','b','c','d','e','f'};
+    private JsonObject getDataUF(UF uf, String prova){
+        JsonObjectBuilder job = Json.createObjectBuilder()
+                .add("UF",uf.toString());
+        if(prova.equals("CN")) {
+            job.add(NOTA, uf.getMediaCN());
+        }
+        if (prova.equals("CH")) {
+            job.add(NOTA, uf.getMediaCH());
+        }
+        if (prova.equals("LC")) {
+            job.add(NOTA, uf.getMediaLC());
+        }
+        if (prova.equals("MT")) {
+            job.add(NOTA, uf.getMediaMT());
+        }
+        for(int i = 0; i<valores.length; i++){
+            job.add(valores[i],(int)(Math.random()*100));
+        }
+        return job.build();
+    }
+    
+    private JsonObject getAxisNota(){
         return Json.createObjectBuilder()
-                .add("UF",uf.toString())
-                .add("nota",(int)(Math.random()*100))
-                .add("R",valores[(int)(Math.random()*valores.length)]+"")
+                .add("name",NOTA)
+                .add("position","right")
+                .add("grid",Json.createObjectBuilder()
+                    .add("visible",true).build())
+                .add("title",Json.createObjectBuilder()
+                    .add("text","Nota").build())
+                .build();
+    }
+    
+    private JsonObject getAxisEscolha(){
+        return Json.createObjectBuilder()
+                .add("name",RESPOSTA)
+                .add("position","left")
+//                .add("type","discrete")
+//                .add("categories",Json.createArrayBuilder()
+//                    .add("a").add("b")
+//                    .add("c").add("d")
+//                    .add("e").add("f").build())
+//                .add("grid",Json.createObjectBuilder()
+//                    .add("visible",true).build())
+                .add("title",Json.createObjectBuilder()
+                    .add("text","Resposta").build())
+//                .add("label",Json.createObjectBuilder()
+//                    .add("rotationAngle",-90).build())
+                .build();
+    }
+    
+    private JsonObject getTooltip(){
+        return Json.createObjectBuilder()
+                .add("enabled",true)
                 .build();
     }
 
