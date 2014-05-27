@@ -18,7 +18,7 @@ import java.util.Map;
 
 /**
  *
- * À partir do arquivo DADOS_ENEM_2012.csv, obtém a média das notas das provas
+ * A partir do arquivo DADOS_ENEM_2012.csv, obtÃ©m a mÃ©dia das notas das provas
  * do ENEM.
  * 
  * @author Matheus
