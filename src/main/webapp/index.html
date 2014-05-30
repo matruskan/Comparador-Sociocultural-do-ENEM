@@ -45,6 +45,7 @@ and open the template in the editor.
                 </td>
             </tr>
         </table>
+        <div class="loading" style="display:none">Aguarde...</div>
         <div id="chartContainer" style="max-width:700px;height: 400px;"></div>
         <div class="sobre"><a href="sobre.html">Sobre</a></div>
         <!--<canvas id="myChart" width="700" height="400"></canvas>-->
@@ -53,7 +54,7 @@ and open the template in the editor.
         <script src="js/globalize.min.js"></script>
         <script src="js/dx.chartjs.js"></script>
         <script type="text/javascript">
-            var fatores = ["Em breve"];
+            var fatores = ["Até quando seu pai estudou?"];
 //                "Até quando seu pai estudou?",//1
 //                "Até quando sua mãe estudou?",
 //                "Qual é a renda mensal de sua família? (Some a sua renda com a dos seus familiares.)",
@@ -75,6 +76,7 @@ and open the template in the editor.
             iniciar();
             
             function atualizarGrafico(){
+                $('.loading').show();
                 //Get the context of the canvas element we want to select
                 var url = "/servlet?fator="+$("#fator").find(":selected").val()+"&prova="+$("#prova").find(":selected").val();
 //                var url = "/comparador-sociocultural-do-enem/servlet?fator="+$("#fator").find(":selected").val()+"&prova="+$("#prova").find(":selected").val();
@@ -94,6 +96,9 @@ and open the template in the editor.
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         console.log("jqXHR : "+jqXHR + " text status : " + textStatus + " error : " + errorThrown);
+                    },
+                    complete: function(jqXHR, textStatus ) {
+                        $('.loading').hide();
                     }
                 });
                 

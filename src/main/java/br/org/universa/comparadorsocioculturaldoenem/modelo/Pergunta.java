@@ -13,6 +13,5 @@ package br.org.universa.comparadorsocioculturaldoenem.modelo;
 public class Pergunta {
     int numero;
     String pergunta;
-    String[] respostas;
-    String[] labelDasRespostas;
+    String[] labelDasOpcoes;
 }

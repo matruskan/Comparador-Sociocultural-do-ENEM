@@ -6,10 +6,15 @@
 
 package br.org.universa.comparadorsocioculturaldoenem;
 
+import br.org.universa.comparadorsocioculturaldoenem.modelo.OpcaoQ1;
+import br.org.universa.comparadorsocioculturaldoenem.modelo.Resposta;
+import br.org.universa.comparadorsocioculturaldoenem.modelo.RespostaDAO;
 import br.org.universa.comparadorsocioculturaldoenem.modelo.UF;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.sql.Connection;
+import java.util.List;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
@@ -30,6 +35,7 @@ public class servlet extends HttpServlet {
     private static final String RESPOSTA = "Resposta";
     
     private String[] valores = {"a","b","c","d","e","f"};
+ 
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -116,13 +122,13 @@ public class servlet extends HttpServlet {
     
     private JsonArray getSeries() {
         JsonArrayBuilder jab = Json.createArrayBuilder();
-//        for(int i=0; i<valores.length;i++){
-//            jab.add(Json.createObjectBuilder()
-//                .add("valueField", valores[i])
-//                .add("axis", RESPOSTA)
-//                .add("name",valores[i])
-//                .build());
-//        }
+        for(OpcaoQ1 opcao : OpcaoQ1.values()){
+            jab.add(Json.createObjectBuilder()
+                .add("valueField", opcao.toString())
+                .add("axis", RESPOSTA)
+                .add("name",opcao.getLabel())
+                .build());
+        }
         return jab.add(getSeriesNota()).build();
     }
     
@@ -149,10 +155,21 @@ public class servlet extends HttpServlet {
         if (prova.equals("MT")) {
             job.add(NOTA, uf.getMediaMT());
         }
-        for(int i = 0; i<valores.length; i++){
-            job.add(valores[i],(int)(Math.random()*100));
-        }
+        adicionaRespostas(job,uf);
         return job.build();
+    }
+    
+    private void adicionaRespostas(JsonObjectBuilder job, UF uf){
+        try (Connection conexao = new Conexao().getConexao()) {
+            RespostaDAO respostaDAO = new RespostaDAO(conexao);
+            List<Resposta> respostas = respostaDAO.getRespostas(uf, 1);
+            for(Resposta resposta : respostas){
+//                System.out.println("Resposta: "+resposta.getOpcao()+", total: "+resposta.getTotal());
+                job.add(OpcaoQ1.getOpcao(resposta.getOpcao()).toString(),resposta.getTotal());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
     
     private JsonObject getAxisNota(){

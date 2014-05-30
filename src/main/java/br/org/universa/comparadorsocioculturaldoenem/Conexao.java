@@ -16,8 +16,12 @@ import java.sql.SQLException;
  * @author Matheus
  */
 public class Conexao {
+    
+    public Connection getConexao() throws URISyntaxException, SQLException {
+        return getConexaoPostgresql();
+    }
 
-    public Connection getConexaoClearDB() throws URISyntaxException, SQLException {
+    private Connection getConexaoClearDB() throws URISyntaxException, SQLException {
         URI dbUri = new URI(System.getenv("CLEARDB_DATABASE_URL"));
 
         String username = dbUri.getUserInfo().split(":")[0];
@@ -27,7 +31,7 @@ public class Conexao {
         return DriverManager.getConnection(dbUrl, username, password);
     }
 
-    public Connection getConexaoPostgresql() throws URISyntaxException, SQLException {
+    private Connection getConexaoPostgresql() throws URISyntaxException, SQLException {
         URI dbUri = new URI(System.getenv("DATABASE_URL"));
 
         String username = dbUri.getUserInfo().split(":")[0];
