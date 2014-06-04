@@ -14,101 +14,177 @@ and open the template in the editor.
     <body>
         <h1>Comparador Sociocultural do ENEM</h1>
         <p>
-            É difícil relacionar os fatores socioculturais com a qualidade de
-            aprendizado. Os gráficos ajudarão a ver quais unidades da federação
-            estão com o melhor ensino, e quais os fatores socioculturais que
-            mais influenciaram.
+            Além das provas objetivas e da redação, os participantes do Enem
+            respondem a um questionário socioeconômico que contempla questões
+            sobre seu perfil socioeconômico, família, educação, atividades de
+            trabalho e lazer, escola, interesses, expectativas etc. 
         </p>
-        <table>
-            <tr>
-                <td>Escolha o fator:</td>
-                <td>
-                    <select id="fator">
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>Escolha a prova:</td>
-                <td>
-                    <select id="prova">
-                        <option value='CN'>Ciências da Natureza</option>
-                        <option value='CH'>Ciências Humanas</option>
-                        <option value='LC'>Linguagens e Códigos</option>
-                        <option value='MT'>Matemática</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>
-                    <button onclick="atualizarGrafico()">Atualizar Gráfico</button>
-                </td>
-            </tr>
-        </table>
-        <div class="loading" style="display:none">Aguarde...</div>
-        <div id="chartContainer" style="max-width:700px;height: 400px;"></div>
+        <p>
+            Este projeto apresenta em um gráfico os dados dos questionários e as
+            notas das provas. A visualização dos dados irá facilitar relacionar
+            os fatores sociais, econômicos e culturais com a qualidade de
+            aprendizado em cada unidade da federação.
+        </p>
+        <br/><br/>
+        <form>
+            Quero comparar as médias das notas na prova:
+            <select id="prova">
+                <option value='CN'>Ciências da Natureza</option>
+                <option value='CH'>Ciências Humanas</option>
+                <option value='LC'>Linguagens e Códigos</option>
+                <option value='MT'>Matemática</option>
+            </select>
+            com o fator:
+            <select id="fator">
+            </select>
+            <br/>
+            <button onclick="atualizarGrafico()" type="button">Gerar Gráfico</button>
+            <div class="loading">Aguarde...</div>
+        </form>
+        <div id="chartContainer" style="max-width:700px;height: 0px;"></div>
         <div class="sobre"><a href="sobre.html">Sobre</a></div>
-        <!--<canvas id="myChart" width="700" height="400"></canvas>-->
-        
+
         <script src="js/jquery-2.1.1.min.js"></script>
         <script src="js/globalize.min.js"></script>
         <script src="js/dx.chartjs.js"></script>
         <script type="text/javascript">
-            var fatores = ["Até quando seu pai estudou?"];
-//                "Até quando seu pai estudou?",//1
-//                "Até quando sua mãe estudou?",
-//                "Qual é a renda mensal de sua família? (Some a sua renda com a dos seus familiares.)",
-//                "Quantas pessoas moram em sua casa (incluindo você)?",
-//                "A residência de sua família é?", //5
-//                "A residência de sua família está localizada em?",
-//                "Você tem em sua casa? TV em cores",
-//                "",
-//                "Você tem em sua casa? Freezer (aparelho independente ou parte da geladeira duplex)",//14
-//                "Indique os motivos que levaram você a participar do ENEM: Aumentar a possibilidade de conseguir um emprego",//24
-//                "Indique os motivos que levaram você a participar do ENEM: Participar do Programa de Financiamento Estudantil - FIES",//29
-//                "Caso você ingresse no Ensino Superior privado pretende recorrer aos auxílios abaixo para custeio das mensalidades?  Bolsa de estudos da própria Instituição de Ensino Superior" //37
-//            ];
-            function iniciar(){
-                for(i=0;i<fatores.length;i++){
-                    $('#fator').append("<option value='"+(i+1)+"'>"+fatores[i]+"</option>");
-                }
-            }
-            iniciar();
-            
-            function atualizarGrafico(){
-                $('.loading').show();
-                //Get the context of the canvas element we want to select
-                var url = "/servlet?fator="+$("#fator").find(":selected").val()+"&prova="+$("#prova").find(":selected").val();
-//                var url = "/comparador-sociocultural-do-enem/servlet?fator="+$("#fator").find(":selected").val()+"&prova="+$("#prova").find(":selected").val();
-                console.log(url);
-                $.ajax({
-                    url: url,
-                    type: "GET",
-                    dataType: "json",
-                    success: function(data) {
-                        console.log("Data returned : ");
-                        console.log(data);
+                        var fatores = ['Escolaridade do pai',
+                            'Escolaridade da mãe',
+                            'Renda mensal da família',
+                            'Pessoas morando na casa',
+                            'Residência da família',
+                            'Localização da residência da família',
+                            'Quantidade de TVs em cores em casa',
+                            'Quantidade de Videocassetes e/ou DVDs em casa',
+                            'Quantidade de Rádios em casa',
+                            'Quantidade de Microcomputadores em casa',
+                            'Quantidade de Automóveis em casa',
+                            'Quantidade de Máquinas de lavar roupa em casa',
+                            'Quantidade de Geladeiras em casa',
+                            'Quantidade de Freezers em casa',
+                            'Quantidade de Telefones fixos em casa',
+                            'Quantidade de Telefones celulares em casa',
+                            'Quantidade de Acessos à Internet em casa',
+                            'Quantidade de TVs por assinatura em casa',
+                            'Quantidade de Aspiradores de pó em casa',
+                            'Quantidade de Empregadas mensalistas em casa',
+                            'Quantidade de Banheiros em casa'];
+//                        var fatores = ['Até quando seu pai estudou?',
+//                            'Até quando sua mãe estudou?',
+//                            'Qual é a renda mensal de sua família? (Some a sua renda com a dos seus familiares.)',
+//                            'Quantas pessoas moram em sua casa (incluindo você)? ',
+//                            'A residência de sua família é? ',
+//                            'A residência de sua família está localizada em?',
+//                            'Você tem em sua casa? TV em cores',
+//                            'Você tem em sua casa? Videocassete e/ou DVD',
+//                            'Você tem em sua casa? Rádio',
+//                            'Você tem em sua casa? Microcomputador',
+//                            'Você tem em sua casa? Automóvel ',
+//                            'Você tem em sua casa? Máquina de lavar roupa',
+//                            'Você tem em sua casa? Geladeira',
+//                            'Você tem em sua casa? Freezer (aparelho independente ou parte da geladeira duplex)',
+//                            'Você tem em sua casa? Telefone fixo',
+//                            'Você tem em sua casa? Telefone celular',
+//                            'Você tem em sua casa? Acesso à Internet',
+//                            'Você tem em sua casa? TV por assinatura',
+//                            'Você tem em sua casa? Aspirador de pó',
+//                            'Você tem em sua casa? Empregada mensalista',
+//                            'Você tem em sua casa? Banheiro',
+//                            'Você exerce ou já exerceu atividade remunerada?',
+//                            'Indique os motivos que levaram você a participar do ENEM: Testar meus conhecimentos',
+//                            'Indique os motivos que levaram você a participar do ENEM: Aumentar a possibilidade de conseguir um emprego',
+//                            'Indique os motivos que levaram você a participar do ENEM: Progredir no meu emprego atual',
+//                            'Indique os motivos que levaram você a participar do ENEM: Ingressar na Educação Superior Pública',
+//                            'Indique os motivos que levaram você a participar do ENEM: Ingressar na Educação Superior Privada',
+//                            'Indique os motivos que levaram você a participar do ENEM: Conseguir uma bolsa de estudos (ProUni, outras)',
+//                            'Indique os motivos que levaram você a participar do ENEM: Participar do Programa de Financiamento Estudantil - FIES',
+//                            'Quantos anos você levou para concluir o Ensino Fundamental?',
+//                            'Você deixou de estudar durante o Ensino Fundamental?',
+//                            'Em que tipo de escola você cursou o Ensino Fundamental?',
+//                            'Quantos anos você levou para concluir o Ensino Médio?',
+//                            'Você deixou de estudar durante o Ensino Médio?',
+//                            'Em que tipo de escola você cursou o Ensino Médio?',
+//                            'Caso você ingresse no Ensino Superior privado pretende recorrer aos auxílios abaixo para custeio das mensalidades? Pró-Uni (Programa Universidade para Todos)',
+//                            'Caso você ingresse no Ensino Superior privado pretende recorrer aos auxílios abaixo para custeio das mensalidades? Bolsa de estudos da própria Instituição de Ensino Superior',
+//                            'Caso você ingresse no Ensino Superior privado pretende recorrer aos auxílios abaixo para custeio das mensalidades? Bolsa de estudos da empresa onde trabalho.',
+//                            'Caso você ingresse no Ensino Superior privado pretende recorrer aos auxílios abaixo para custeio das mensalidades?Auxílio do Programa de Financiamento Estudantil - FIES',
+//                            'Você cursa ou já cursou a Educação de Jovens e Adultos – EJA?',
+//                            'Como é ou era o principal curso de EJA que você frequenta ou frequentou?',
+//                            'Indique o que levou você a deixar de cursar a EJA: Trabalhava, não tinha tempo de estudar.',
+//                            'Indique o que levou você a deixar de cursar a EJA: Estudava no curso da empresa e foi interrompido.',
+//                            'Indique o que levou você a deixar de cursar a EJA: Ocorreram problemas de saúde ou acidentes comigo ou familiares',
+//                            'Indique o que levou você a deixar de cursar a EJA: Mudei de bairro, cidade ou município.',
+//                            'Indique o que levou você a deixar de cursar a EJA: Por motivos pessoais, casamento, filhos, etc.',
+//                            'Indique o que levou você a deixar de cursar a EJA: Faltava-me interesse, desisti.',
+//                            'Indique o que levou você a deixar de cursar a EJA: Senti-me discriminado(a).',
+//                            'Indique o que levou você a deixar de cursar a EJA: Temi/Sofri violência.',
+//                            'Você já frequentou o ensino regular?',
+//                            'Indique o que levou você a deixar de cursar o ensino regular: Falta de vaga em escola pública.',
+//                            'Indique o que levou você a deixar de cursar o ensino regular: Ausência de escola perto de casa.',
+//                            'Indique o que levou você a deixar de cursar o ensino regular: Dificuldades após reprovação.',
+//                            'Indique o que levou você a deixar de cursar o ensino regular: Falta de interesse em estudar.',
+//                            'Indique o que levou você a deixar de cursar o ensino regular: Falta de condições adequadas na escola.',
+//                            'Indique o que levou você a deixar de cursar o ensino regular: Trabalho, falta de tempo para estudar.',
+//                            'Indique o que levou você a deixar de cursar o ensino regular: Motivos pessoais, casamento / filhos, etc',
+//                            'Indique o que levou você a deixar de cursar o ensino regular: Falta de apoio familiar.',
+//                            'Indique o que levou você a deixar de cursar o ensino regular: Problemas de saúde ou acidente comigo ou familiares.',
+//                            'Indique o que levou você a deixar de cursar o ensino regular: Discriminação / Preconceitos (sexo, raça, idade, classe etc.)',
+//                            'Indique o que levou você a deixar de cursar o ensino regular: Medo de sofrer violência.',
+//                            'Quantos anos você tinha quando deixou de frequentar o ensino regular?'
+//                        ];
 
-                        if (typeof data == 'object') {
-                            criarGrafico(data);
+                        function iniciar() {
+                            for (i = 0; i < fatores.length; i++) {
+                                $('#fator').append("<option value='" + (i + 1) + "'>" + fatores[i] + "</option>");
+                            }
+                        }
+                        iniciar();
+
+                        var objeto;
+                        function atualizarGrafico() {
+                            mostrarAguarde();
+                            //Get the context of the canvas element we want to select
+                            var url = "/servlet?fator=" + $("#fator").find(":selected").val() + "&prova=" + $("#prova").find(":selected").val();
+//                var url = "/comparador-sociocultural-do-enem/servlet?fator="+$("#fator").find(":selected").val()+"&prova="+$("#prova").find(":selected").val();
+                            console.log(url);
+                            $.ajax({
+                                url: url,
+                                type: "GET",
+                                dataType: "json",
+                                success: function(data) {
+                                    console.log("Data returned : ");
+                                    console.log(data);
+                                    objeto = data;
+                                    if (typeof data == 'object') {
+                                        data.valueAxis[1].label.customizeText=function(value){return value.value+'%';};
+                                        criarGrafico(data);
+                                    }
+
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    esconderAguarde();
+                                    console.log("jqXHR : " + jqXHR + " text status : " + textStatus + " error : " + errorThrown);
+                                },
+                                complete: function(jqXHR, textStatus) {
+                                    esconderAguarde();
+                                }
+                            });
+
                         }
 
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.log("jqXHR : "+jqXHR + " text status : " + textStatus + " error : " + errorThrown);
-                    },
-                    complete: function(jqXHR, textStatus ) {
-                        $('.loading').hide();
-                    }
-                });
-                
-            }
-            
-            function criarGrafico(data){
-                // Ainda não...
-                 $("#chartContainer").dxChart(data);
-//                $("#chartContainer").append("Em breve!");
-            }
+                        function criarGrafico(data) {
+                            // Ainda não...
+                            $("#chartContainer").height(700);
+                            $("#chartContainer").dxChart(data);
+                        }
+                        
+                        function mostrarAguarde(){
+                            $('.loading').css('opacity','1');
+                        }
+                        
+                        function esconderAguarde(){
+                            $('.loading').css('opacity','0');
+                        }
         </script>
     </body>
 </html>

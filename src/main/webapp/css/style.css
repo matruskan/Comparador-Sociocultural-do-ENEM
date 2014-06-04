@@ -14,7 +14,7 @@ body{
     border:1px solid #eeeeee;
 }
 select{
-    max-width: 700px;
+    max-width: 575px;
 }
 .sobre{
     float:right;
@@ -22,4 +22,15 @@ select{
 }
 .sobre a{
     color:#8888aa;
+}
+
+.loading{
+    opacity:0;
+    transition: all 0.4s;
+}
+
+form{
+    font-style: italic;
+    color:#777f88;
+    text-align: center;
 }

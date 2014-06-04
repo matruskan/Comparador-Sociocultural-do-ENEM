@@ -1,5 +1,8 @@
 package br.org.universa.comparadorsocioculturaldoenem.modelo;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 /**
  * As médias foram obtidas da saída de uma execução do Totalizador.
  * 
@@ -73,4 +76,18 @@ public enum UF {
         return mediaMT;
     }
     
+    public static UF[] ordenadoPorCN(){
+        UF[] ufs = UF.values();
+        Arrays.sort(ufs, new Comparator<UF>(){
+
+            @Override
+            public int compare(UF uf1, UF uf2) {
+                if(uf1.getMediaCN()>uf2.getMediaCN()) return 1;
+                if(uf1.getMediaCN()<uf2.getMediaCN()) return -1;
+                return 0;
+            }
+            
+        });
+        return ufs;
+    }
 }
