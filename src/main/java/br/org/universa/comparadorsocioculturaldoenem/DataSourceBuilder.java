@@ -103,10 +103,10 @@ public class DataSourceBuilder {
                 porcentagemTotalMelhoresNotas += porcentagemPorUFePorResposta[ufs[i].ordinal()][numeroDaResposta];
             }
             if (porcentagemTotalPioresNotas > porcentagemTotalMelhoresNotas) {
-                respostasMenoresNotas.add(opcoes.get(numeroDaResposta - 1));
+                respostasMenoresNotas.add(opcoes.get(numeroDaResposta));
             }
             if (porcentagemTotalPioresNotas < porcentagemTotalMelhoresNotas) {
-                respostasMaioresNotas.add(opcoes.get(numeroDaResposta - 1));
+                respostasMaioresNotas.add(opcoes.get(numeroDaResposta));
             }
         }
     }

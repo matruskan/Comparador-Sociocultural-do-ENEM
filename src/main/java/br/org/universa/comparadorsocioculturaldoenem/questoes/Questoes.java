@@ -22,6 +22,9 @@ public class Questoes {
         if (numeroDaQuestao > 7 && numeroDaQuestao <= 21) {
             numeroDaQuestao = 7;
         }
+        if (numeroDaQuestao > 23 && numeroDaQuestao <= 29) {
+            numeroDaQuestao = 23;
+        }
         String nomeDoArquivo = "questao" + numeroDaQuestao + ".txt";
         List<String> opcoes = new ArrayList<String>();
 //        System.out.println(getClass().getClassLoader().getResource(nomeDoArquivo).getFile());

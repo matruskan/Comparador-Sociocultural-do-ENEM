@@ -159,7 +159,7 @@ public class servlet extends HttpServlet {
         JsonArrayBuilder jab = Json.createArrayBuilder();
         int quantidadeDeRespostas = new Questoes().getOpcoes(numeroDaQuestao).size();
         for (int i = 0; i < quantidadeDeRespostas; i++) {
-            String cor = Integer.toString(255 * (i + 1) / (quantidadeDeRespostas + 1));
+            String cor = Integer.toString(220 * (i + 1) / (quantidadeDeRespostas + 1));
             cor = "rgba(" + cor + "," + cor + "," + cor + ",0.7)";
 //            System.out.println("Cor: "+cor);
             jab.add(cor);
@@ -192,11 +192,13 @@ public class servlet extends HttpServlet {
         JsonArrayBuilder jab = Json.createArrayBuilder();
         List<String> opcoes = new Questoes().getOpcoes(numeroDaQuestao);
         for (int i = opcoes.size() - 1; i >= 0; i--) {
-            jab.add(Json.createObjectBuilder()
-                    .add("valueField", i + 1)
-                    .add("axis", RESPOSTA)
-                    .add("name", opcoes.get(i))
-                    .build());
+            if (!opcoes.get(i).trim().isEmpty()) {
+                jab.add(Json.createObjectBuilder()
+                        .add("valueField", i)
+                        .add("axis", RESPOSTA)
+                        .add("name", opcoes.get(i))
+                        .build());
+            }
         }
         return jab.add(getSeriesNota()).build();
     }

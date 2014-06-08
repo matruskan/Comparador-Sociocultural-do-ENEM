@@ -1,0 +1,6 @@
+0. Irrelevante
+1. Muito pouco relevante
+2. Pouco relevante
+3. Relevante
+4. Muito relevante
+5. Muitíssimo relevante
