@@ -90,4 +90,49 @@ public enum UF {
         });
         return ufs;
     }
+    
+    public static UF[] ordenadoPorCH(){
+        UF[] ufs = UF.values();
+        Arrays.sort(ufs, new Comparator<UF>(){
+
+            @Override
+            public int compare(UF uf1, UF uf2) {
+                if(uf1.getMediaCH()>uf2.getMediaCH()) return 1;
+                if(uf1.getMediaCH()<uf2.getMediaCH()) return -1;
+                return 0;
+            }
+            
+        });
+        return ufs;
+    }
+    
+    public static UF[] ordenadoPorLC(){
+        UF[] ufs = UF.values();
+        Arrays.sort(ufs, new Comparator<UF>(){
+
+            @Override
+            public int compare(UF uf1, UF uf2) {
+                if(uf1.getMediaLC()>uf2.getMediaLC()) return 1;
+                if(uf1.getMediaLC()<uf2.getMediaLC()) return -1;
+                return 0;
+            }
+            
+        });
+        return ufs;
+    }
+    
+    public static UF[] ordenadoPorMT(){
+        UF[] ufs = UF.values();
+        Arrays.sort(ufs, new Comparator<UF>(){
+
+            @Override
+            public int compare(UF uf1, UF uf2) {
+                if(uf1.getMediaMT()>uf2.getMediaMT()) return 1;
+                if(uf1.getMediaMT()<uf2.getMediaMT()) return -1;
+                return 0;
+            }
+            
+        });
+        return ufs;
+    }
 }

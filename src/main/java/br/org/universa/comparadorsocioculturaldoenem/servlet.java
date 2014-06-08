@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class servlet extends HttpServlet {
 
-    private static final String NOTA = "Nota";
+    public static final String NOTA = "Nota";
     private static final String RESPOSTA = "Resposta";
 
     /**
@@ -66,10 +66,16 @@ public class servlet extends HttpServlet {
 
     private JsonObject getDxChart(String prova, int numeroDaQuestao) {
 
+        UF[] ufs = getUFsOrdenadosPorNota(prova);
+        DataSourceBuilder dsb = new DataSourceBuilder(prova, numeroDaQuestao, ufs);
         return Json.createObjectBuilder()
+                .add("provaEscolhida", getProvaEscolhida(prova))
+                .add("fatorEscolhido", numeroDaQuestao)
+                .add("estadosComMaiorNota", getEstadosComMaiorNota(ufs))
+                .add("estadosComMenorNota", getEstadosComMenorNota(ufs))
                 .add("palette", getPalette(numeroDaQuestao))
-//                .add("palette", "Soft Pastel")
-                .add("dataSource", getDataSource(prova, numeroDaQuestao))
+                //                .add("palette", "Soft Pastel")
+                .add("dataSource", dsb.getDataSource())
                 .add("commonSeriesSettings", getCommonSeriesSettings())
                 .add("series", getSeries(numeroDaQuestao))
                 .add("valueAxis", Json.createArrayBuilder()
@@ -80,7 +86,67 @@ public class servlet extends HttpServlet {
                         .add("horizontalAlignment", "center").build())
                 .add("tooltip", Json.createObjectBuilder()
                         .add("enabled", true).build())
+                .add("respostasMaiorNota", getJsonArray(dsb.getRespostasMaioresNotas()))
+                .add("respostasMenorNota", getJsonArray(dsb.getRespostasMenoresNotas()))
                 .build();
+    }
+
+    private UF[] getUFsOrdenadosPorNota(String prova) {
+        if (prova.equals("CN")) {
+            return UF.ordenadoPorCN();
+        }
+        if (prova.equals("CH")) {
+            return UF.ordenadoPorCH();
+        }
+        if (prova.equals("LC")) {
+            return UF.ordenadoPorLC();
+        }
+        if (prova.equals("MT")) {
+            return UF.ordenadoPorMT();
+        }
+        return UF.values();
+    }
+
+    private String getProvaEscolhida(String prova) {
+        if (prova.equals("CN")) {
+            return "Ciências da Natureza";
+        }
+        if (prova.equals("CH")) {
+            return "Ciências Humanas";
+        }
+        if (prova.equals("LC")) {
+            return "Linguagens e Códigos";
+        }
+        if (prova.equals("MT")) {
+            return "Matemática";
+        }
+        return "";
+    }
+
+    private String getEstadosComMaiorNota(UF[] ufs) {
+        StringBuilder sb = new StringBuilder(26);
+        for (int i = ufs.length - 1; i > ufs.length - 7; i--) {
+            sb.append(ufs[i].toString()).append(", ");
+        }
+        sb.append(ufs[ufs.length - 7]);
+        return sb.toString();
+    }
+
+    private String getEstadosComMenorNota(UF[] ufs) {
+        StringBuilder sb = new StringBuilder(26);
+        for (int i = 0; i < 6; i++) {
+            sb.append(ufs[i].toString()).append(", ");
+        }
+        sb.append(ufs[6]);
+        return sb.toString();
+    }
+
+    private JsonArray getJsonArray(List<String> strings) {
+        JsonArrayBuilder jab = Json.createArrayBuilder();
+        for (String s : strings) {
+            jab.add(s);
+        }
+        return jab.build();
     }
 
     private void write(Writer writer, JsonObject model) {
@@ -93,8 +159,8 @@ public class servlet extends HttpServlet {
         JsonArrayBuilder jab = Json.createArrayBuilder();
         int quantidadeDeRespostas = new Questoes().getOpcoes(numeroDaQuestao).size();
         for (int i = 0; i < quantidadeDeRespostas; i++) {
-            String cor = Integer.toHexString(0xff * (i + 1) / (quantidadeDeRespostas + 1));
-            cor = "#" + cor + cor + cor;
+            String cor = Integer.toString(255 * (i + 1) / (quantidadeDeRespostas + 1));
+            cor = "rgba(" + cor + "," + cor + "," + cor + ",0.7)";
 //            System.out.println("Cor: "+cor);
             jab.add(cor);
         }
@@ -133,51 +199,6 @@ public class servlet extends HttpServlet {
                     .build());
         }
         return jab.add(getSeriesNota()).build();
-    }
-
-    private JsonArray getDataSource(String prova, int numeroDaQuestao) {
-        JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
-        for (int i = 0; i < UF.values().length; i++) {
-            jsonArrayBuilder.add(getDataUF(UF.ordenadoPorCN()[i], prova, numeroDaQuestao));
-        }
-        return jsonArrayBuilder.build();
-    }
-
-    private JsonObject getDataUF(UF uf, String prova, int numeroDaQuestao) {
-        JsonObjectBuilder job = Json.createObjectBuilder()
-                .add("UF", uf.toString());
-        if (prova.equals("CN")) {
-            job.add(NOTA, uf.getMediaCN());
-        }
-        if (prova.equals("CH")) {
-            job.add(NOTA, uf.getMediaCH());
-        }
-        if (prova.equals("LC")) {
-            job.add(NOTA, uf.getMediaLC());
-        }
-        if (prova.equals("MT")) {
-            job.add(NOTA, uf.getMediaMT());
-        }
-        adicionaRespostas(job, uf, numeroDaQuestao);
-        return job.build();
-    }
-
-    private void adicionaRespostas(JsonObjectBuilder job, UF uf, int numeroDaQuestao) {
-        try (Connection conexao = new Conexao().getConexao()) {
-            RespostaDAO respostaDAO = new RespostaDAO(conexao);
-            List<Resposta> respostas = respostaDAO.getRespostas(uf, numeroDaQuestao);
-            int total = 0;
-            for (Resposta resposta : respostas) {
-                total += resposta.getTotal();
-            }
-//            List<String> opcoes = new Questoes().getOpcoes(numeroDaQuestao);
-            for (Resposta resposta : respostas) {
-//                System.out.println("Resposta: "+resposta.getOpcao()+", total: "+resposta.getTotal());
-                job.add(resposta.getOpcao().toString(), resposta.getTotal() * 100 / total);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 
     private JsonObject getAxisNota() {

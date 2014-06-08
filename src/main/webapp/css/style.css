@@ -29,8 +29,32 @@ select{
     transition: all 0.4s;
 }
 
-form{
+form, #resumo span, #resumo ul li{
     font-style: italic;
-    color:#777f88;
+    color:#778899;
     text-align: center;
+}
+#resumo>div{
+    width: 284px;
+    padding:20px;
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    margin:10px;
+    display: inline-block;
+    vertical-align: top;
+}
+#resumo .face{
+    font-size: 40px;
+    float:left;
+    padding: 10px;
+    font-style: normal;
+}
+#resumo ul li{
+    text-align: left !important;
+}
+.menores-notas .face{
+    color:#cc0000 !important;
+}
+.maiores-notas .face{
+    color:#00cc00 !important;
 }

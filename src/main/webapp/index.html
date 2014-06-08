@@ -41,6 +41,44 @@ and open the template in the editor.
             <button onclick="atualizarGrafico()" type="button">Gerar Gráfico</button>
             <div class="loading">Aguarde...</div>
         </form>
+        <div id="resumo" style="height: 0px; overflow:hidden;">
+            <h2>Resumo:</h2>
+            <div class="maiores-notas">
+                <span class="face">&#9786;</span>
+                <p>
+                    Os 7 estados com as maiores médias em
+                    <span class="prova-escolhida"></span>
+                    foram:<br/>
+                    <span id="estados-com-maior-nota"></span>.
+                </p>
+                <p>
+                    Nesses estados, uma porcentagem maior de
+                    participantes respondeu que a
+                    <span class="fator-escolhido"></span>
+                    era:
+                </p>
+                <ul id="respostas-maior-nota">
+                </ul>
+            </div>
+            <div class="menores-notas">
+                <span class="face">&#9785;</span>
+                <p>
+                    Os 7 estados com as piores médias em
+                    <span class="prova-escolhida"></span>
+                    foram:<br/>
+                    <span id="estados-com-menor-nota"></span>.
+                </p>
+                <p>
+                    Nesses estados, uma porcentagem maior de
+                    participantes respondeu que a
+                    <span class="fator-escolhido"></span>
+                    era:
+                </p>
+                <ul id="respostas-menor-nota">
+                </ul>
+            </div>
+            <h2>Gráfico:</h2>
+        </div>
         <div id="chartContainer" style="max-width:700px;height: 0px;"></div>
         <div class="sobre"><a href="sobre.html">Sobre</a></div>
 
@@ -151,13 +189,14 @@ and open the template in the editor.
                                 url: url,
                                 type: "GET",
                                 dataType: "json",
-                                success: function(data) {
-                                    console.log("Data returned : ");
-                                    console.log(data);
-                                    objeto = data;
-                                    if (typeof data == 'object') {
-                                        data.valueAxis[1].label.customizeText=function(value){return value.value+'%';};
-                                        criarGrafico(data);
+                                success: function(dados) {
+                                    console.log("Dados : ");
+                                    console.log(dados);
+                                    objeto = dados;
+                                    if (typeof dados == 'object') {
+                                        dados.valueAxis[1].label.customizeText=function(value){return value.value+'%';};
+                                        preencherResumo(dados);
+                                        criarGrafico(dados);
                                     }
 
                                 },
@@ -172,10 +211,10 @@ and open the template in the editor.
 
                         }
 
-                        function criarGrafico(data) {
+                        function criarGrafico(dados) {
                             // Ainda não...
                             $("#chartContainer").height(700);
-                            $("#chartContainer").dxChart(data);
+                            $("#chartContainer").dxChart(dados);
                         }
                         
                         function mostrarAguarde(){
@@ -184,6 +223,26 @@ and open the template in the editor.
                         
                         function esconderAguarde(){
                             $('.loading').css('opacity','0');
+                        }
+                        
+                        function preencherResumo(dados){
+                            $("#resumo").height('auto');
+                            $('.prova-escolhida').html(dados.provaEscolhida);
+                            $('.fator-escolhido').html(fatores[dados.fatorEscolhido-1]);
+                            $('#estados-com-maior-nota').html(dados.estadosComMaiorNota);
+                            $('#estados-com-menor-nota').html(dados.estadosComMenorNota);
+                            $('#respostas-maior-nota').html("");
+                            $('#respostas-menor-nota').html("");
+                            for(i = 0; i<dados.respostasMaiorNota.length; i++){
+                                $('#respostas-maior-nota').append("<li>"
+                                        +dados.respostasMaiorNota[i]
+                                        +"</li>")
+                            }
+                            for(i = 0; i<dados.respostasMenorNota.length; i++){
+                                $('#respostas-menor-nota').append("<li>"
+                                        +dados.respostasMenorNota[i]
+                                        +"</li>")
+                            }
                         }
         </script>
     </body>
